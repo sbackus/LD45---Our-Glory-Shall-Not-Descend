@@ -1,26 +1,6 @@
 import tcod as libtcod
+from input_handlers import handle_keys
 
-def handle_keys(key):
-    # Movement keys
-    if key.vk == libtcod.KEY_UP:
-        return {'move': (0, -1)}
-    elif key.vk == libtcod.KEY_DOWN:
-        return {'move': (0, 1)}
-    elif key.vk == libtcod.KEY_LEFT:
-        return {'move': (-1, 0)}
-    elif key.vk == libtcod.KEY_RIGHT:
-        return {'move': (1, 0)}
-
-    if key.vk == libtcod.KEY_ENTER and key.lalt:
-        # Alt+Enter: toggle full screen
-        return {'fullscreen': True}
-
-    elif key.vk == libtcod.KEY_ESCAPE:
-        # Exit the game
-        return {'exit': True}
-
-    # No key was pressed
-    return {}
 
 def main():
     screen_width = 80
@@ -33,15 +13,20 @@ def main():
 
     libtcod.console_init_root(screen_width, screen_height, 'Rogue Possession', False)
 
+    con = libtcod.console_new(screen_width, screen_height)
+
     key = libtcod.Key()
     mouse = libtcod.Mouse()
 
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
-        libtcod.console_set_default_foreground(0, libtcod.white)
-        libtcod.console_put_char(0, player_x, player_y, '@', libtcod.BKGND_NONE)
+        libtcod.console_set_default_foreground(con, libtcod.white)
+        libtcod.console_put_char(con, player_x, player_y, '@', libtcod.BKGND_NONE)
+        libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
         libtcod.console_flush()
+
+        libtcod.console_put_char(con, player_x, player_y, ' ', libtcod.BKGND_NONE)
 
         action = handle_keys(key)
 
