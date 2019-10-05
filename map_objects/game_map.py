@@ -13,9 +13,10 @@ from render_functions import RenderOrder
 
 
 class GameMap:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
+    def __init__(self, config):
+        self.config = config
+        self.width = config.map_width
+        self.height = config.map_height
         self.tiles = self.initialize_tiles()
 
     def initialize_tiles(self):
@@ -23,17 +24,17 @@ class GameMap:
 
         return tiles
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room, max_items_per_room):
+    def make_map(self, player, entities):
         rooms = []
         num_rooms = 0
 
-        for r in range(max_rooms):
+        for r in range(self.config.max_rooms):
             # random width and height
-            w = randint(room_min_size, room_max_size)
-            h = randint(room_min_size, room_max_size)
+            w = randint(self.config.room_min_size, self.config.room_max_size)
+            h = randint(self.config.room_min_size, self.config.room_max_size)
             # random position without going out of the boundaries of the map
-            x = randint(0, map_width - w - 1)
-            y = randint(0, map_height - h - 1)
+            x = randint(0, self.config.map_width - w - 1)
+            y = randint(0, self.config.map_height - h - 1)
 
             # "Rect" class makes rectangles easier to work with
             new_room = Rect(x, y, w, h)
@@ -72,7 +73,7 @@ class GameMap:
                         self.create_v_tunnel(prev_y, new_y, prev_x)
                         self.create_h_tunnel(prev_x, new_x, new_y)
 
-                self.place_entities(new_room, entities, max_monsters_per_room, max_items_per_room)
+                self.place_entities(new_room, entities, self.config.max_monsters_per_room, self.config.max_items_per_room)
 
                 # finally, append the new room to the list
                 rooms.append(new_room)

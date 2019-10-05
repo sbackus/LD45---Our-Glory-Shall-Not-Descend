@@ -10,11 +10,11 @@ class Message:
 
 
 class MessageLog:
-    def __init__(self, x, width, height):
+    def __init__(self, config):
         self.messages = []
-        self.x = x
-        self.width = width
-        self.height = height
+        self.x = config.message_x
+        self.width = config.message_width
+        self.height = config.message_height
 
     def add_message(self, message):
         # Split the message if necessary, among multiple lines
