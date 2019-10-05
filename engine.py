@@ -9,9 +9,23 @@ from input_handlers import handle_keys, handle_mouse
 from loader_functions.initialize_new_game import Constants, get_game_variables
 from render_functions import clear_all, render_all
 
+from os import path
+import sys
+
+# Get the current location of the bundled App (a la PyInstaller)
+app_dir = getattr(sys, '_MEIPASS', path.abspath(path.dirname(__file__)))
+
+
+def app_path(*local_path_segments):
+    # Account for varying slash marks across filesystems & OSes
+    return path.join(app_dir, *local_path_segments)
+
+arial_font_path = app_path('assets', 'images', 'arial10x10.png')
+
+
 def main():
 
-    libtcod.console_set_custom_font('assets/images/arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    libtcod.console_set_custom_font(arial_font_path, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
     libtcod.console_init_root(Constants.screen_width, Constants.screen_height, 'Rogue Possession', False)
 
