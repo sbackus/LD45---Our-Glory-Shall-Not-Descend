@@ -1,8 +1,8 @@
 import tcod as libtcod
 
-
+from components.ai import SlowMonster
 from death_functions import kill_monster, kill_player
-from entity import get_blocking_entities_at_location
+from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
 from game_messages import Message
 from game_states import GameStates
@@ -10,7 +10,7 @@ from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.data_loaders import save_game, load_game
 from loader_functions.initialize_new_game import Constants, get_game_variables
 from menus import main_menu, message_box
-from render_functions import clear_all, render_all
+from render_functions import RenderOrder, clear_all, render_all
 
 from os import path
 import sys
@@ -30,7 +30,7 @@ def main():
 
     libtcod.console_set_custom_font(arial_font_path, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-    libtcod.console_init_root(Constants.screen_width, Constants.screen_height, 'Rogue Possession', False)
+    libtcod.console_init_root(Constants.screen_width, Constants.screen_height, Constants.window_title, False)
 
     con = libtcod.console_new(Constants.screen_width, Constants.screen_height)
     panel = libtcod.console_new(Constants.screen_width, Constants.panel_height)
@@ -129,11 +129,28 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         show_character_screen = action.get('show_character_screen')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
+        possession = action.get('possession')
 
         left_click = mouse_action.get('left_click')
         right_click = mouse_action.get('right_click')
 
         player_turn_results = []
+
+        if possession:
+            if not player.fighter:
+                for entity in entities:
+                    if entity.fighter and entity.x == player.x and entity.y == player.y:
+                        player.fighter = entity.fighter
+                        player.char = entity.char
+                        entities.remove(entity)
+
+            else:
+                ai_component = SlowMonster()
+                monster = Entity(player.x, player.y, 'z', libtcod.desaturated_green, 'Zombie', blocks=True, render_order=RenderOrder.ACTOR, fighter=player.fighter, ai=ai_component)
+                monster.fighter.xp = 0
+                player.fighter = None
+                player.char = '@'
+                entities.append(monster)
 
         if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = move
@@ -263,7 +280,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     game_state = GameStates.LEVEL_UP
 
             if dead_entity:
-                if dead_entity == player:
+                if dead_entity.fighter == player.fighter:
                     message, game_state = kill_player(dead_entity)
                 else:
                     message = kill_monster(dead_entity)
@@ -319,7 +336,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             message_log.add_message(message)
 
                         if dead_entity:
-                            if dead_entity == player:
+                            if dead_entity.fighter == player.fighter:
                                 message, game_state = kill_player(dead_entity)
                             else:
                                 message = kill_monster(dead_entity)

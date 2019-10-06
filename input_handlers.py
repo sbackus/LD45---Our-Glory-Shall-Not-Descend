@@ -60,6 +60,8 @@ def handle_player_turn_keys(key):
     elif key_char == 'z' or key_char == ' ':
         return {'wait': True}
 
+    elif key_char == 'p':
+        return {'possession': True}
 
     if key_char == 'g':
         return {'pickup': True}
