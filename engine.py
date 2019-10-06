@@ -1,8 +1,12 @@
 import tcod as libtcod
 
-
+from components.ai import SlowMonster
+from components.equipment import EquipmentSlots, Equipment
+from components.inventory import Inventory
+from components.equippable import Equippable
+from components.fighter import Fighter
 from death_functions import kill_monster, kill_player
-from entity import get_blocking_entities_at_location
+from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
 from game_messages import Message
 from game_states import GameStates
@@ -10,7 +14,7 @@ from input_handlers import handle_keys, handle_mouse, handle_main_menu
 from loader_functions.data_loaders import save_game, load_game
 from loader_functions.initialize_new_game import Constants, get_game_variables
 from menus import main_menu, message_box
-from render_functions import clear_all, render_all
+from render_functions import RenderOrder, clear_all, render_all
 
 from os import path
 import sys
@@ -30,7 +34,7 @@ def main():
 
     libtcod.console_set_custom_font(arial_font_path, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-    libtcod.console_init_root(Constants.screen_width, Constants.screen_height, 'Rogue Possession', False)
+    libtcod.console_init_root(Constants.screen_width, Constants.screen_height, Constants.window_title, False)
 
     con = libtcod.console_new(Constants.screen_width, Constants.screen_height)
     panel = libtcod.console_new(Constants.screen_width, Constants.panel_height)
@@ -104,8 +108,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
+        fov_radius = player.fighter.fov() if player.fighter else Constants.min_fov_radius
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, Constants.fov_radius, Constants.fov_light_walls, Constants.fov_algorithm)
+            recompute_fov(fov_map, player.x, player.y, fov_radius, Constants.fov_light_walls, Constants.fov_algorithm)
 
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, Constants.screen_width,
                    Constants.screen_height, Constants.bar_width, Constants.panel_height, Constants.panel_y, mouse, Constants.colors, game_state)
@@ -129,11 +134,53 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         show_character_screen = action.get('show_character_screen')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
+        possession = action.get('possession')
+        start_test_mode = action.get('start_test_mode')
 
         left_click = mouse_action.get('left_click')
         right_click = mouse_action.get('right_click')
 
         player_turn_results = []
+
+        if start_test_mode:
+            fighter_component = Fighter(hp=30, defense=2, power=8, body='god mode', xp=100, will_power = 4)
+            player.fighter = fighter_component
+            player.fighter.owner = player
+            player.inventory = Inventory(26)
+            player.equipment = Equipment()
+            player.inventory.owner = player
+            player.equipment.owner = player
+            equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
+            item = Entity(player.x, player.y, '/', libtcod.red, 'Small Dagger', equippable=equippable_component)
+            entities.append(item)
+
+        if possession:
+            if not player.fighter:
+                for entity in entities:
+                    if entity.fighter and entity.x == player.x and entity.y == player.y:
+                        if player.level.current_level >= entity.fighter.will_power:
+                            message_log.add_message(Message(f'You take control of the {entity.name} body', libtcod.blue))
+                            player.fighter = entity.fighter
+                            player.inventory = entity.inventory
+                            player.equipment = entity.equipment
+                            player.fighter.owner = player
+                            player.char = entity.char
+                            entities.remove(entity)
+                        else:
+                            message_log.add_message(Message(f'{entity.name} is too powerful for you to possess', libtcod.blue))
+
+
+            else:
+                message_log.add_message(Message(f'You cast your spirit out of your body leaving a shambling husk behind', libtcod.blue))
+                ai_component = SlowMonster()
+                monster = Entity(player.x, player.y, 'z', libtcod.desaturated_green, 'Zombie', blocks=True, render_order=RenderOrder.ACTOR, fighter=player.fighter, ai=ai_component, inventory = player.inventory, equipment = player.equipment)
+                monster.fighter.xp = 5
+                player.fighter = None
+                player.inventory = None
+                player.equipemnt = None
+                player.char = '@'
+                monster.fighter.owner = monster
+                entities.append(monster)
 
         if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = move
@@ -142,7 +189,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             if not game_map.is_blocked(destination_x, destination_y):
                 target = get_blocking_entities_at_location(entities, destination_x, destination_y)
 
-                if target:
+                if target and player.fighter:
                     attack_results = player.fighter.attack(target)
                     player_turn_results.extend(attack_results)
                 else:
@@ -154,14 +201,18 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             game_state = GameStates.ENEMY_TURN
 
         elif pickup and game_state == GameStates.PLAYERS_TURN:
-            for entity in entities:
-                if entity.item and entity.x == player.x and entity.y == player.y:
-                    pickup_results = player.inventory.add_item(entity)
-                    player_turn_results.extend(pickup_results)
+            if player.inventory:
+                for entity in entities:
+                    if entity.item and entity.x == player.x and entity.y == player.y:
+                        pickup_results = player.inventory.add_item(entity)
+                        player_turn_results.extend(pickup_results)
 
-                    break
+                        break
+                else:
+                    message_log.add_message(Message('There is nothing here to pick up.', libtcod.yellow))
             else:
-                message_log.add_message(Message('There is nothing here to pick up.', libtcod.yellow))
+                message_log.add_message(Message('you can not pick things up until you find a body', libtcod.yellow))
+
 
         if show_inventory:
             previous_game_state = game_state
@@ -171,7 +222,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             previous_game_state = game_state
             game_state = GameStates.DROP_INVENTORY
 
-        if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(
+        if inventory_index is not None and player.inventory and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(
                 player.inventory.items):
             item = player.inventory.items[inventory_index]
             if game_state == GameStates.SHOW_INVENTORY:
@@ -192,13 +243,14 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 message_log.add_message(Message('There are no stairs here.', libtcod.yellow))
 
         if level_up:
-            if level_up == 'hp':
-                player.fighter.base_max_hp += 20
-                player.fighter.hp += 20
-            elif level_up == 'str':
-                player.fighter.base_power += 1
-            elif level_up == 'def':
-                player.fighter.base_defense += 1
+            if player.fighter:
+                if level_up == 'hp':
+                    player.fighter.base_max_hp += 20
+                    player.fighter.hp += 20
+                elif level_up == 'str':
+                    player.fighter.base_power += 1
+                elif level_up == 'def':
+                    player.fighter.base_defense += 1
 
             game_state = previous_game_state
 
@@ -248,17 +300,21 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
             if xp:
                 leveled_up = player.level.add_xp(xp)
+                fighter_leveled_up = player.fighter.level.add_xp(xp)
                 message_log.add_message(Message('You gain {0} experience points.'.format(xp)))
 
                 if leveled_up:
                     message_log.add_message(Message(
                         'You grow stronger! You reached level {0}'.format(
                             player.level.current_level) + '!', libtcod.yellow))
+                    message_log.add_message(Message('you can now possess larger creatures'))
+
+                if fighter_leveled_up:
                     previous_game_state = game_state
                     game_state = GameStates.LEVEL_UP
 
             if dead_entity:
-                if dead_entity == player:
+                if dead_entity.fighter == player.fighter:
                     message, game_state = kill_player(dead_entity)
                 else:
                     message = kill_monster(dead_entity)
@@ -314,7 +370,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             message_log.add_message(message)
 
                         if dead_entity:
-                            if dead_entity == player:
+                            if dead_entity.fighter == player.fighter:
                                 message, game_state = kill_player(dead_entity)
                             else:
                                 message = kill_monster(dead_entity)

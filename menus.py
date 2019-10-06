@@ -31,21 +31,22 @@ def menu(con, header, options, width, screen_width, screen_height):
 
 
 def inventory_menu(con, header, player, inventory_width, screen_width, screen_height):
-    # show a menu with each item of the inventory as an option
-    if len(player.inventory.items) == 0:
-        options = ['Inventory is empty.']
-    else:
-        options = []
+    if player.inventory:
+        # show a menu with each item of the inventory as an option
+        if len(player.inventory.items) == 0:
+            options = ['Inventory is empty.']
+        else:
+            options = []
 
-        for item in player.inventory.items:
-            if player.equipment.main_hand == item:
-                options.append('{0} (on main hand)'.format(item.name))
-            elif player.equipment.off_hand == item:
-                options.append('{0} (on off hand)'.format(item.name))
-            else:
-                options.append(item.name)
+            for item in player.inventory.items:
+                if player.equipment.main_hand == item:
+                    options.append('{0} (on main hand)'.format(item.name))
+                elif player.equipment.off_hand == item:
+                    options.append('{0} (on off hand)'.format(item.name))
+                else:
+                    options.append(item.name)
 
-    menu(con, header, options, inventory_width, screen_width, screen_height)
+        menu(con, header, options, inventory_width, screen_width, screen_height)
 
 
 def main_menu(con, background_image, screen_width, screen_height):
@@ -80,12 +81,13 @@ def character_screen(player, character_screen_width, character_screen_height, sc
                                   libtcod.LEFT, 'Experience: {0}'.format(player.level.current_xp))
     libtcod.console_print_rect_ex(window, 0, 4, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
                                   libtcod.LEFT, 'Experience to Level: {0}'.format(player.level.experience_to_next_level))
-    libtcod.console_print_rect_ex(window, 0, 6, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
-                                  libtcod.LEFT, 'Maximum HP: {0}'.format(player.fighter.max_hp))
-    libtcod.console_print_rect_ex(window, 0, 7, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
-                                  libtcod.LEFT, 'Attack: {0}'.format(player.fighter.power))
-    libtcod.console_print_rect_ex(window, 0, 8, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
-                                  libtcod.LEFT, 'Defense: {0}'.format(player.fighter.defense))
+    if player.fighter:
+        libtcod.console_print_rect_ex(window, 0, 6, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
+                                      libtcod.LEFT, 'Maximum HP: {0}'.format(player.fighter.max_hp))
+        libtcod.console_print_rect_ex(window, 0, 7, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
+                                      libtcod.LEFT, 'Attack: {0}'.format(player.fighter.power))
+        libtcod.console_print_rect_ex(window, 0, 8, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
+                                      libtcod.LEFT, 'Defense: {0}'.format(player.fighter.defense))
 
     x = screen_width // 2 - character_screen_width // 2
     y = screen_height // 2 - character_screen_height // 2

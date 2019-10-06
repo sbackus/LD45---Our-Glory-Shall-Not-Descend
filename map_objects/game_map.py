@@ -2,10 +2,12 @@ import tcod as libtcod
 from random import randint
 
 from components.ai import BasicMonster
-from components.equipment import EquipmentSlots
+from components.equipment import Equipment, EquipmentSlots
 from components.equippable import Equippable
 from components.fighter import Fighter
+from components.inventory import Inventory
 from components.item import Item
+from components.level import Level
 from components.stairs import Stairs
 from entity import Entity
 from game_messages import Message
@@ -127,12 +129,17 @@ class GameMap:
         number_of_items = randint(0, max_items_per_room)
 
         monster_chances = {
-            'orc': 80,
+            'rat': from_dungeon_level([[80, 1], [40, 3], [15, 5]], self.dungeon_level),
+            'goblin': from_dungeon_level([[15, 1], [40, 3], [15, 5]], self.dungeon_level),
+            'orc': from_dungeon_level([[20, 2], [30, 4], [60, 6]], self.dungeon_level),
             'troll': from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
         }
 
         item_chances = {
+            'torch': 10,
             'healing_potion': 35,
+            'dagger': from_dungeon_level([[7, 1]], self.dungeon_level),
+            'buckler': from_dungeon_level([[7, 2]], self.dungeon_level),
             'sword': from_dungeon_level([[35, 4]], self.dungeon_level),
             'shield': from_dungeon_level([[35, 8]], self.dungeon_level),
             'lightning_scroll': from_dungeon_level([[25, 4]], self.dungeon_level),
@@ -147,14 +154,23 @@ class GameMap:
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
                 monster_choice = random_choice_from_dict(monster_chances)
 
-                if monster_choice == 'orc':
-                    fighter_component = Fighter(hp=20, defense=0, power=4, xp=35)
+                if monster_choice == 'rat':
+                    fighter_component = Fighter(hp=5, defense=0, power=1, body=monster_choice, xp=10, will_power = 1)
                     ai_component = BasicMonster()
-                    monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                    monster = Entity(x, y, 'r', libtcod.desaturated_green, 'Rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                elif monster_choice == 'goblin':
+                    level_component = Level(current_level=1, current_xp=0, level_up_base=50, level_up_factor=100)
+                    fighter_component = Fighter(hp=10, defense=0, power=2, body=monster_choice, fov=7, xp=20, level=level_component, will_power = 2)
+                    ai_component = BasicMonster()
+                    monster = Entity(x, y, 'g', libtcod.desaturated_green, 'Goblin', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component, inventory = Inventory(2), equipment = Equipment())
+                elif monster_choice == 'orc':
+                    fighter_component = Fighter(hp=20, defense=0, power=4, body=monster_choice, fov=4, xp=35, will_power = 3)
+                    ai_component = BasicMonster()
+                    monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component, inventory = Inventory(10), equipment = Equipment())
                 else:
-                    fighter_component = Fighter(hp=30, defense=2, power=8, xp=100)
+                    fighter_component = Fighter(hp=30, defense=2, power=8, body=monster_choice, xp=100, will_power = 4)
                     ai_component = BasicMonster()
-                    monster = Entity(x, y, 'T', libtcod.darker_green, 'Troll', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                    monster = Entity(x, y, 'T', libtcod.darker_green, 'Troll', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component, inventory = Inventory(15), equipment = Equipment())
 
                 entities.append(monster)
 
@@ -169,12 +185,21 @@ class GameMap:
                     item_component = Item(use_function=heal, amount=40)
                     item = Entity(x, y, '!', libtcod.violet, 'Healing Potion', render_order=RenderOrder.ITEM,
                                   item=item_component)
+                elif item_choice == 'torch':
+                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, fov_bonus=5)
+                    item = Entity(x, y, 't', libtcod.yellow, 'Torch', equippable=equippable_component)
                 elif item_choice == 'sword':
                     equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
                     item = Entity(x, y, '/', libtcod.sky, 'Sword', equippable=equippable_component)
                 elif item_choice == 'shield':
-                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
+                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=2)
                     item = Entity(x, y, '[', libtcod.darker_orange, 'Shield', equippable=equippable_component)
+                elif item_choice == 'dagger':
+                    equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
+                    item = Entity(x, y, '/', libtcod.red, 'Small Dagger', equippable=equippable_component)
+                elif item_choice == 'buckler':
+                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
+                    item = Entity(x, y, '[', libtcod.red, 'Rotten Buckler', equippable=equippable_component)
                 elif item_choice == 'fireball_scroll':
                     item_component = Item(use_function=cast_fireball, targeting=True, targeting_message=Message(
                         'Left-click a target tile for the fireball, or right-click to cancel.', libtcod.light_cyan),
@@ -200,7 +225,8 @@ class GameMap:
         self.tiles = self.initialize_tiles()
         self.make_map(player, entities)
 
-        player.fighter.heal(player.fighter.max_hp // 2)
+        if player.fighter:
+            player.fighter.heal(player.fighter.max_hp // 2)
 
         message_log.add_message(Message('You take a moment to rest, and recover your strength.', libtcod.light_violet))
 

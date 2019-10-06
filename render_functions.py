@@ -13,11 +13,11 @@ class RenderOrder(Enum):
 def get_names_under_mouse(mouse, entities, fov_map):
     (x, y) = (mouse.cx, mouse.cy)
 
-    names = [entity.name for entity in entities
+    info = [entity.stats() for entity in entities
              if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
-    names = ', '.join(names)
+    info = ', '.join(info)
 
-    return names.capitalize()
+    return info.capitalize()
 
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
     bar_width = int(float(value) / maximum * total_width)
@@ -42,10 +42,11 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
                 wall = game_map.tiles[x][y].block_sight
 
                 if visible:
+                    lighting = 'illuminated' if player.equipment and player.equipment.fov_bonus > 0 else 'shadowed'
                     if wall:
-                        libtcod.console_set_char_background(con, x, y, colors.get('light_wall'), libtcod.BKGND_SET)
+                        libtcod.console_set_char_background(con, x, y, colors.get(f'{lighting}_wall'), libtcod.BKGND_SET)
                     else:
-                        libtcod.console_set_char_background(con, x, y, colors.get('light_ground'), libtcod.BKGND_SET)
+                        libtcod.console_set_char_background(con, x, y, colors.get(f'{lighting}_ground'), libtcod.BKGND_SET)
                     game_map.tiles[x][y].explored = True
                 elif game_map.tiles[x][y].explored:
                     if wall:
@@ -60,7 +61,8 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         draw_entity(con, entity, fov_map, game_map)
 
     libtcod.console_set_default_foreground(con, libtcod.white)
-    libtcod.console_print_ex(con, 1, screen_height - 2, libtcod.BKGND_NONE, libtcod.LEFT, 'HP: {0:02}/{1:02}'.format(player.fighter.hp, player.fighter.max_hp))
+    if player.fighter:
+        libtcod.console_print_ex(con, 1, screen_height - 2, libtcod.BKGND_NONE, libtcod.LEFT, 'HP: {0:02}/{1:02}'.format(player.fighter.hp, player.fighter.max_hp))
 
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
@@ -73,7 +75,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         inventory_menu(con, inventory_title, player, 50, screen_width, screen_height)
 
     elif game_state == GameStates.LEVEL_UP:
-        level_up_menu(con, 'Level up! Choose a stat to raise:', player, 40, screen_width, screen_height)
+        level_up_menu(con, 'Level up!', player, 40, screen_width, screen_height)
 
     elif game_state == GameStates.CHARACTER_SCREEN:
         character_screen(player, 30, 10, screen_width, screen_height)
@@ -88,7 +90,8 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         libtcod.console_print_ex(panel, message_log.x, y, libtcod.BKGND_NONE, libtcod.LEFT, message.text)
         y += 1
 
-    render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp,
+    if player.fighter:
+        render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp,
                libtcod.light_red, libtcod.darker_red)
     libtcod.console_print_ex(panel, 1, 3, libtcod.BKGND_NONE, libtcod.LEFT,
                              'Dungeon level: {0}'.format(game_map.dungeon_level))

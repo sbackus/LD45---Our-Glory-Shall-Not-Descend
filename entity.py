@@ -62,6 +62,12 @@ class Entity:
         self.x += dx
         self.y += dy
 
+    def stats(self):
+        if self.fighter:
+            return f'{self.name} hp:{self.fighter.hp}'
+        else:
+            return self.name
+
     def move_towards(self, target_x, target_y, game_map, entities):
         dx = target_x - self.x
         dy = target_y - self.y
