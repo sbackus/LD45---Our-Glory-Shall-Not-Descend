@@ -1,6 +1,7 @@
 import tcod as libtcod
 
 from game_messages import Message
+from components.level import Level
 
 class Fighter:
     def __init__(self, hp, defense, power, body, xp=0, will_power = 1):
@@ -11,7 +12,7 @@ class Fighter:
         self.xp = xp
         self.will_power = will_power
         self.body = body
-        
+        self.level = Level()
 
     @property
     def max_hp(self):

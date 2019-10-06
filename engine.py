@@ -282,6 +282,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
             if xp:
                 leveled_up = player.level.add_xp(xp)
+                fighter_leveled_up = player.fighter.level.add_xp(xp)
                 message_log.add_message(Message('You gain {0} experience points.'.format(xp)))
 
                 if leveled_up:
@@ -289,6 +290,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         'You grow stronger! You reached level {0}'.format(
                             player.level.current_level) + '!', libtcod.yellow))
                     message_log.add_message(Message('you can now possess larger creatures'))
+
+                if fighter_leveled_up:
+                    previous_game_state = game_state
+                    game_state = GameStates.LEVEL_UP
 
             if dead_entity:
                 if dead_entity.fighter == player.fighter:
