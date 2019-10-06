@@ -138,6 +138,8 @@ class GameMap:
         item_chances = {
             'torch': 10,
             'healing_potion': 35,
+            'dagger': from_dungeon_level([[7, 1]], self.dungeon_level),
+            'buckler': from_dungeon_level([[7, 2]], self.dungeon_level),
             'sword': from_dungeon_level([[35, 4]], self.dungeon_level),
             'shield': from_dungeon_level([[35, 8]], self.dungeon_level),
             'lightning_scroll': from_dungeon_level([[25, 4]], self.dungeon_level),
@@ -190,8 +192,14 @@ class GameMap:
                     equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
                     item = Entity(x, y, '/', libtcod.sky, 'Sword', equippable=equippable_component)
                 elif item_choice == 'shield':
-                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
+                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=2)
                     item = Entity(x, y, '[', libtcod.darker_orange, 'Shield', equippable=equippable_component)
+                elif item_choice == 'dagger':
+                    equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
+                    item = Entity(x, y, '/', libtcod.red, 'Small Dagger', equippable=equippable_component)
+                elif item_choice == 'buckler':
+                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
+                    item = Entity(x, y, '[', libtcod.red, 'Rotten Buckler', equippable=equippable_component)
                 elif item_choice == 'fireball_scroll':
                     item_component = Item(use_function=cast_fireball, targeting=True, targeting_message=Message(
                         'Left-click a target tile for the fireball, or right-click to cancel.', libtcod.light_cyan),

@@ -1,6 +1,10 @@
 import tcod as libtcod
 
 from components.ai import SlowMonster
+from components.equipment import EquipmentSlots, Equipment
+from components.inventory import Inventory
+from components.equippable import Equippable
+from components.fighter import Fighter
 from death_functions import kill_monster, kill_player
 from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
@@ -131,11 +135,24 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
         possession = action.get('possession')
+        start_test_mode = action.get('start_test_mode')
 
         left_click = mouse_action.get('left_click')
         right_click = mouse_action.get('right_click')
 
         player_turn_results = []
+
+        if start_test_mode:
+            fighter_component = Fighter(hp=30, defense=2, power=8, body='god mode', xp=100, will_power = 4)
+            player.fighter = fighter_component
+            player.fighter.owner = player
+            player.inventory = Inventory(26)
+            player.equipment = Equipment()
+            player.inventory.owner = player
+            player.equipment.owner = player
+            equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
+            item = Entity(player.x, player.y, '/', libtcod.red, 'Small Dagger', equippable=equippable_component)
+            entities.append(item)
 
         if possession:
             if not player.fighter:
