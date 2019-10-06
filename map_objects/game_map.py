@@ -200,7 +200,8 @@ class GameMap:
         self.tiles = self.initialize_tiles()
         self.make_map(player, entities)
 
-        player.fighter.heal(player.fighter.max_hp // 2)
+        if player.fighter:
+            player.fighter.heal(player.fighter.max_hp // 2)
 
         message_log.add_message(Message('You take a moment to rest, and recover your strength.', libtcod.light_violet))
 

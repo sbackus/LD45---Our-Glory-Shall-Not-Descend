@@ -16,13 +16,9 @@ from map_objects.game_map import GameMap
 from render_functions import RenderOrder
 
 def get_game_variables(config):
-    fighter_component = Fighter(hp=100, defense=2, power=4)
-    inventory_component = Inventory(26)
     level_component = Level()
-    equipment_component = Equipment()
 
-    player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
-                    fighter=fighter_component, inventory=inventory_component, level=level_component, equipment=equipment_component)
+    player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR, level=level_component)
     entities = [player]
 
     game_map = GameMap(config)
@@ -35,7 +31,7 @@ def get_game_variables(config):
     return player, entities, game_map, message_log, game_state
 
 class Constants:
-    window_title = 'Start with Nothing'
+    window_title = 'Our Glory Shall Not Descend'
 
     screen_width = 80
     screen_height = 50

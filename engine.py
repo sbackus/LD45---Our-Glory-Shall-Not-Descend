@@ -142,7 +142,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             if not game_map.is_blocked(destination_x, destination_y):
                 target = get_blocking_entities_at_location(entities, destination_x, destination_y)
 
-                if target:
+                if target and player.fighter:
                     attack_results = player.fighter.attack(target)
                     player_turn_results.extend(attack_results)
                 else:
@@ -154,14 +154,18 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             game_state = GameStates.ENEMY_TURN
 
         elif pickup and game_state == GameStates.PLAYERS_TURN:
-            for entity in entities:
-                if entity.item and entity.x == player.x and entity.y == player.y:
-                    pickup_results = player.inventory.add_item(entity)
-                    player_turn_results.extend(pickup_results)
+            if player.inventory:
+                for entity in entities:
+                    if entity.item and entity.x == player.x and entity.y == player.y:
+                        pickup_results = player.inventory.add_item(entity)
+                        player_turn_results.extend(pickup_results)
 
-                    break
+                        break
+                else:
+                    message_log.add_message(Message('There is nothing here to pick up.', libtcod.yellow))
             else:
-                message_log.add_message(Message('There is nothing here to pick up.', libtcod.yellow))
+                message_log.add_message(Message('you can not pick things up until you find a body', libtcod.yellow))
+
 
         if show_inventory:
             previous_game_state = game_state
@@ -171,7 +175,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             previous_game_state = game_state
             game_state = GameStates.DROP_INVENTORY
 
-        if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(
+        if inventory_index is not None and player.inventory and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(
                 player.inventory.items):
             item = player.inventory.items[inventory_index]
             if game_state == GameStates.SHOW_INVENTORY:
@@ -192,13 +196,14 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 message_log.add_message(Message('There are no stairs here.', libtcod.yellow))
 
         if level_up:
-            if level_up == 'hp':
-                player.fighter.base_max_hp += 20
-                player.fighter.hp += 20
-            elif level_up == 'str':
-                player.fighter.base_power += 1
-            elif level_up == 'def':
-                player.fighter.base_defense += 1
+            if player.fighter:
+                if level_up == 'hp':
+                    player.fighter.base_max_hp += 20
+                    player.fighter.hp += 20
+                elif level_up == 'str':
+                    player.fighter.base_power += 1
+                elif level_up == 'def':
+                    player.fighter.base_defense += 1
 
             game_state = previous_game_state
 
