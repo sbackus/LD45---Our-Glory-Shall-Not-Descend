@@ -218,8 +218,13 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
 
         if show_inventory:
-            previous_game_state = game_state
-            game_state = GameStates.SHOW_INVENTORY
+            if player.inventory:
+                previous_game_state = game_state
+                game_state = GameStates.SHOW_INVENTORY
+            elif player.fighter:
+                message_log.add_message(Message('This creature cannot carry items.', libtcod.yellow))
+            else:
+                message_log.add_message(Message('You lack a body to carry items...', libtcod.yellow))
 
         if drop_inventory:
             previous_game_state = game_state
