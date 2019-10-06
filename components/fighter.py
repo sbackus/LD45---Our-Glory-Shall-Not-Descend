@@ -4,15 +4,16 @@ from game_messages import Message
 from components.level import Level
 
 class Fighter:
-    def __init__(self, hp, defense, power, body, xp=0, will_power = 1):
+    def __init__(self, hp, defense, power, body, fov=5, xp=0, will_power = 1, level=None):
         self.base_max_hp = hp
         self.hp = hp
         self.base_defense = defense
         self.base_power = power
+        self.base_fov = fov
         self.xp = xp
         self.will_power = will_power
         self.body = body
-        self.level = Level()
+        self.level = level or Level()
 
     @property
     def max_hp(self):
@@ -31,6 +32,14 @@ class Fighter:
             bonus = 0
 
         return self.base_power + bonus
+
+    def fov(self):
+        if self.owner and self.owner.equipment:
+            bonus = self.owner.equipment.fov_bonus
+        else:
+            bonus = 0
+
+        return self.base_fov + bonus
 
     @property
     def defense(self):

@@ -7,6 +7,7 @@ from components.equippable import Equippable
 from components.fighter import Fighter
 from components.inventory import Inventory
 from components.item import Item
+from components.level import Level
 from components.stairs import Stairs
 from entity import Entity
 from game_messages import Message
@@ -135,6 +136,7 @@ class GameMap:
         }
 
         item_chances = {
+            'torch': 10,
             'healing_potion': 35,
             'sword': from_dungeon_level([[35, 4]], self.dungeon_level),
             'shield': from_dungeon_level([[35, 8]], self.dungeon_level),
@@ -155,11 +157,12 @@ class GameMap:
                     ai_component = BasicMonster()
                     monster = Entity(x, y, 'r', libtcod.desaturated_green, 'Rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
                 elif monster_choice == 'goblin':
-                    fighter_component = Fighter(hp=10, defense=0, power=2, body=monster_choice, xp=10, will_power = 2)
+                    level_component = Level(current_level=1, current_xp=0, level_up_base=50, level_up_factor=100)
+                    fighter_component = Fighter(hp=10, defense=0, power=2, body=monster_choice, fov=7, xp=20, level=level_component, will_power = 2)
                     ai_component = BasicMonster()
                     monster = Entity(x, y, 'g', libtcod.desaturated_green, 'Goblin', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component, inventory = Inventory(2), equipment = Equipment())
                 elif monster_choice == 'orc':
-                    fighter_component = Fighter(hp=20, defense=0, power=4, body=monster_choice, xp=35, will_power = 3)
+                    fighter_component = Fighter(hp=20, defense=0, power=4, body=monster_choice, fov=4, xp=35, will_power = 3)
                     ai_component = BasicMonster()
                     monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component, inventory = Inventory(10), equipment = Equipment())
                 else:
@@ -180,6 +183,9 @@ class GameMap:
                     item_component = Item(use_function=heal, amount=40)
                     item = Entity(x, y, '!', libtcod.violet, 'Healing Potion', render_order=RenderOrder.ITEM,
                                   item=item_component)
+                elif item_choice == 'torch':
+                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, fov_bonus=5)
+                    item = Entity(x, y, 't', libtcod.yellow, 'Torch', equippable=equippable_component)
                 elif item_choice == 'sword':
                     equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
                     item = Entity(x, y, '/', libtcod.sky, 'Sword', equippable=equippable_component)

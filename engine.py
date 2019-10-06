@@ -104,8 +104,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
+        fov_radius = player.fighter.fov() if player.fighter else Constants.min_fov_radius
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, Constants.fov_radius, Constants.fov_light_walls, Constants.fov_algorithm)
+            recompute_fov(fov_map, player.x, player.y, fov_radius, Constants.fov_light_walls, Constants.fov_algorithm)
 
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, Constants.screen_width,
                    Constants.screen_height, Constants.bar_width, Constants.panel_height, Constants.panel_y, mouse, Constants.colors, game_state)

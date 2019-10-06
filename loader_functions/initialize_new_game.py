@@ -16,10 +16,10 @@ from map_objects.game_map import GameMap
 from render_functions import RenderOrder
 
 def get_game_variables(config):
-    level_component = Level()
+    level_component = Level(current_level=1, current_xp=0, level_up_base=5, level_up_factor=5)
 
     player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR, level=level_component)
-    
+
     entities = [player]
 
     game_map = GameMap(config)
@@ -54,7 +54,7 @@ class Constants:
 
     fov_algorithm = 0
     fov_light_walls = True
-    fov_radius = 10
+    min_fov_radius = 4
 
     max_monsters_per_room = 3
     max_items_per_room = 2
@@ -62,8 +62,10 @@ class Constants:
     colors = {
         'dark_wall': libtcod.Color(1, 1, 111),
         'dark_ground': libtcod.Color(49, 51, 152),
-        'light_wall': libtcod.Color(130, 110, 50),
-        'light_ground': libtcod.Color(200, 180, 50)
+        'shadowed_wall': libtcod.Color(0, 0, 90),
+        'shadowed_ground': libtcod.Color(60, 60, 160),
+        'illuminated_wall': libtcod.Color(130, 110, 50),
+        'illuminated_ground': libtcod.Color(200, 180, 50)
     }
 
     constants = {
@@ -83,7 +85,7 @@ class Constants:
         'max_rooms': max_rooms,
         'fov_algorithm': fov_algorithm,
         'fov_light_walls': fov_light_walls,
-        'fov_radius': fov_radius,
+        'min_fov_radius': min_fov_radius,
         'max_monsters_per_room': max_monsters_per_room,
         'max_items_per_room': max_items_per_room,
         'colors': colors
