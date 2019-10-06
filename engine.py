@@ -140,16 +140,20 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             if not player.fighter:
                 for entity in entities:
                     if entity.fighter and entity.x == player.x and entity.y == player.y:
+                        message_log.add_message(Message(f'You take control of the {entity.name} body', libtcod.blue))
                         player.fighter = entity.fighter
+                        player.fighter.owner = player
                         player.char = entity.char
                         entities.remove(entity)
 
             else:
+                message_log.add_message(Message(f'You cast your spirit out of your body leaving a shambling husk behind', libtcod.blue))
                 ai_component = SlowMonster()
                 monster = Entity(player.x, player.y, 'z', libtcod.desaturated_green, 'Zombie', blocks=True, render_order=RenderOrder.ACTOR, fighter=player.fighter, ai=ai_component)
                 monster.fighter.xp = 0
                 player.fighter = None
                 player.char = '@'
+                monster.fighter.owner = monster
                 entities.append(monster)
 
         if move and game_state == GameStates.PLAYERS_TURN:

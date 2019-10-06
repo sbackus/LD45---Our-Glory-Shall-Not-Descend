@@ -127,7 +127,8 @@ class GameMap:
         number_of_items = randint(0, max_items_per_room)
 
         monster_chances = {
-            'orc': 80,
+            'rat': from_dungeon_level([[80, 1], [40, 3], [15, 5]], self.dungeon_level),
+            'orc': from_dungeon_level([[20, 1], [30, 3], [60, 7]], self.dungeon_level),
             'troll': from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
         }
 
@@ -147,7 +148,11 @@ class GameMap:
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
                 monster_choice = random_choice_from_dict(monster_chances)
 
-                if monster_choice == 'orc':
+                if monster_choice == 'rat':
+                    fighter_component = Fighter(hp=5, defense=0, power=1, xp=10)
+                    ai_component = BasicMonster()
+                    monster = Entity(x, y, 'r', libtcod.desaturated_green, 'Orc', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                elif monster_choice == 'orc':
                     fighter_component = Fighter(hp=20, defense=0, power=4, xp=35)
                     ai_component = BasicMonster()
                     monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
