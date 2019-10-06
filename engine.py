@@ -23,10 +23,10 @@ def app_path(*local_path_segments):
     # Account for varying slash marks across filesystems & OSes
     return path.join(app_dir, *local_path_segments)
 
-arial_font_path = app_path('assets', 'images', 'arial10x10.png')
-
 
 def main():
+
+    arial_font_path = app_path('assets', 'images', 'arial10x10.png')
 
     libtcod.console_set_custom_font(arial_font_path, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
@@ -44,7 +44,8 @@ def main():
     show_main_menu = True
     show_load_error_message = False
 
-    main_menu_background_image = libtcod.image_load('assets/images/menu_background1.png')
+    bg_path = app_path('assets', 'images', 'menu_fire_background.png')
+    main_menu_background_image = libtcod.image_load(bg_path)
 
     key = libtcod.Key()
     mouse = libtcod.Mouse()
