@@ -1,8 +1,5 @@
 import tcod as libtcod
 
-from components.equipment import Equipment
-from components.fighter import Fighter
-from components.inventory import Inventory
 from components.level import Level
 
 from entity import Entity
@@ -18,7 +15,7 @@ from render_functions import RenderOrder
 def get_game_variables(config):
     level_component = Level(current_level=1, current_xp=0, level_up_base=2, level_up_factor=2)
 
-    player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR, level=level_component)
+    player = Entity(0, 0, ' ', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.GHOST, level=level_component)
 
     entities = [player]
 

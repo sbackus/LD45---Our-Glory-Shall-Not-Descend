@@ -5,6 +5,7 @@ from game_states import GameStates
 from menus import inventory_menu, level_up_menu, character_screen
 
 class RenderOrder(Enum):
+    GHOST = auto()
     STAIRS = auto()
     CORPSE = auto()
     ITEM = auto()
@@ -59,6 +60,9 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
     # Draw all entities in the list
     for entity in entities_in_render_order:
         draw_entity(con, entity, fov_map, game_map)
+
+    # Cast a spooky shadow under the ghost/possessed creature
+    libtcod.console_set_char_background(con, player.x, player.y, colors.get('dark_ground'), libtcod.BKGND_SET)
 
     libtcod.console_set_default_foreground(con, libtcod.white)
     if player.fighter:

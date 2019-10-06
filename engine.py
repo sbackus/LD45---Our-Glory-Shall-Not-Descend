@@ -165,6 +165,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             player.equipment = entity.equipment
                             player.fighter.owner = player
                             player.char = entity.char
+                            player.render_order = entity.render_order
                             entities.remove(entity)
                         else:
                             message_log.add_message(Message(f'{entity.name} is too powerful for you to possess', libtcod.blue))
@@ -177,8 +178,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 monster.fighter.xp = 5
                 player.fighter = None
                 player.inventory = None
-                player.equipemnt = None
-                player.char = '@'
+                player.equipment = None
+                player.char = ' '
+                player.render_order = RenderOrder.GHOST
+
                 monster.fighter.owner = monster
                 entities.append(monster)
 
