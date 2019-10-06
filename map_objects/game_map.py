@@ -128,7 +128,8 @@ class GameMap:
 
         monster_chances = {
             'rat': from_dungeon_level([[80, 1], [40, 3], [15, 5]], self.dungeon_level),
-            'orc': from_dungeon_level([[20, 1], [30, 3], [60, 7]], self.dungeon_level),
+            'goblin': from_dungeon_level([[15, 1], [40, 3], [15, 5]], self.dungeon_level),
+            'orc': from_dungeon_level([[20, 2], [30, 4], [60, 6]], self.dungeon_level),
             'troll': from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
         }
 
@@ -149,15 +150,19 @@ class GameMap:
                 monster_choice = random_choice_from_dict(monster_chances)
 
                 if monster_choice == 'rat':
-                    fighter_component = Fighter(hp=5, defense=0, power=1, xp=10)
+                    fighter_component = Fighter(hp=5, defense=0, power=1, xp=10, will_power = 1)
                     ai_component = BasicMonster()
-                    monster = Entity(x, y, 'r', libtcod.desaturated_green, 'Orc', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                    monster = Entity(x, y, 'r', libtcod.desaturated_green, 'rat', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                elif monster_choice == 'goblin':
+                    fighter_component = Fighter(hp=10, defense=0, power=2, xp=10, will_power = 2)
+                    ai_component = BasicMonster()
+                    monster = Entity(x, y, 'g', libtcod.desaturated_green, 'Goblin', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
                 elif monster_choice == 'orc':
-                    fighter_component = Fighter(hp=20, defense=0, power=4, xp=35)
+                    fighter_component = Fighter(hp=20, defense=0, power=4, xp=35, will_power = 3)
                     ai_component = BasicMonster()
                     monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
                 else:
-                    fighter_component = Fighter(hp=30, defense=2, power=8, xp=100)
+                    fighter_component = Fighter(hp=30, defense=2, power=8, xp=100, will_power = 4)
                     ai_component = BasicMonster()
                     monster = Entity(x, y, 'T', libtcod.darker_green, 'Troll', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 

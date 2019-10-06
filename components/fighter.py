@@ -3,12 +3,13 @@ import tcod as libtcod
 from game_messages import Message
 
 class Fighter:
-    def __init__(self, hp, defense, power, xp=0):
+    def __init__(self, hp, defense, power, xp=0, will_power = 1):
         self.base_max_hp = hp
         self.hp = hp
         self.base_defense = defense
         self.base_power = power
         self.xp = xp
+        self.will_power = will_power
 
     @property
     def max_hp(self):
@@ -40,6 +41,8 @@ class Fighter:
     def take_damage(self, amount):
         results = []
         self.hp -= amount
+        if self.hp < self.max_hp/4:
+            self.will_power = self.will_power/2
         if self.hp <= 0:
             results.append({'dead': self.owner, 'xp': self.xp})
 
