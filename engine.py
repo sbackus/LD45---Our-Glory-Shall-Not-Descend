@@ -143,6 +143,8 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         if player.level.current_level >= entity.fighter.will_power:
                             message_log.add_message(Message(f'You take control of the {entity.name} body', libtcod.blue))
                             player.fighter = entity.fighter
+                            player.inventory = entity.inventory
+                            player.equipment = entity.equipment
                             player.fighter.owner = player
                             player.char = entity.char
                             entities.remove(entity)
@@ -153,9 +155,11 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             else:
                 message_log.add_message(Message(f'You cast your spirit out of your body leaving a shambling husk behind', libtcod.blue))
                 ai_component = SlowMonster()
-                monster = Entity(player.x, player.y, 'z', libtcod.desaturated_green, 'Zombie', blocks=True, render_order=RenderOrder.ACTOR, fighter=player.fighter, ai=ai_component)
+                monster = Entity(player.x, player.y, 'z', libtcod.desaturated_green, 'Zombie', blocks=True, render_order=RenderOrder.ACTOR, fighter=player.fighter, ai=ai_component, inventory = player.inventory, equipment = player.equipment)
                 monster.fighter.xp = 5
                 player.fighter = None
+                player.inventory = None
+                player.equipemnt = None
                 player.char = '@'
                 monster.fighter.owner = monster
                 entities.append(monster)

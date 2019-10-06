@@ -19,6 +19,7 @@ def get_game_variables(config):
     level_component = Level()
 
     player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR, level=level_component)
+    
     entities = [player]
 
     game_map = GameMap(config)
@@ -59,8 +60,8 @@ class Constants:
     max_items_per_room = 2
 
     colors = {
-        'dark_wall': libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.Color(50, 50, 150),
+        'dark_wall': libtcod.Color(1, 1, 111),
+        'dark_ground': libtcod.Color(49, 51, 152),
         'light_wall': libtcod.Color(130, 110, 50),
         'light_ground': libtcod.Color(200, 180, 50)
     }
