@@ -103,7 +103,7 @@ def death_screen(death_screen_width, death_screen_height, screen_width, screen_h
     libtcod.console_set_default_foreground(window, libtcod.red)
 
     libtcod.console_print_rect_ex(window, 0, 1, death_screen_width, death_screen_height, libtcod.BKGND_NONE,
-        libtcod.LEFT, 'You died a horrible death.  The shock of it mades you forget everything.  You descend back to where you started leaving your things behind. \n Press \'c\' to continue.')
+        libtcod.LEFT, 'You died a horrible death.  The shock of it mades you forget everything.  You descend back to where you started leaving your things behind. \nPress \'c\' to continue. \nOr \'esc\' to quit.')
 
     x = screen_width // 2 - death_screen_width // 2
     y = screen_height // 2 - death_screen_height // 2
