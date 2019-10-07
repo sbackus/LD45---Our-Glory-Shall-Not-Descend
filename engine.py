@@ -34,10 +34,10 @@ def main():
 
     libtcod.console_set_custom_font(arial_font_path, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-    libtcod.console_init_root(Constants.screen_width, Constants.screen_height, Constants.window_title, False, libtcod.RENDERER_SDL2)
+    libtcod.console_init_root(Constants.screen_width, Constants.screen_height, Constants.window_title, False, libtcod.RENDERER_SDL2, vsync=False)
 
-    con = libtcod.console_new(Constants.screen_width, Constants.screen_height)
-    panel = libtcod.console_new(Constants.screen_width, Constants.panel_height)
+    con = libtcod.console.Console(Constants.screen_width, Constants.screen_height)
+    panel = libtcod.console.Console(Constants.screen_width, Constants.panel_height)
 
     player = None
     entities = []
@@ -89,7 +89,7 @@ def main():
                 break
 
         else:
-            libtcod.console_clear(con)
+            con.clear()
             play_game(player, entities, game_map, message_log, game_state, con, panel, Constants)
 
             show_main_menu = True
@@ -165,7 +165,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             game_state = GameStates.PLAYERS_TURN
             fov_map = initialize_fov(game_map)
             fov_recompute = True
-            libtcod.console_clear(con)
+            con.clear()
 
         if possession:
             if not player.fighter:
