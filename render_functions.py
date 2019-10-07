@@ -98,9 +98,13 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         y += 1
 
     if player.fighter:
+        if player.possessed_entity and player.possessed_entity.name:
+            centered_name = player.possessed_entity.name.center(20)
+        else:
+            centered_name = "???".center(20)
         libtcod.console_set_default_foreground(panel, libtcod.white)
         libtcod.console_print_ex(panel, 1, 1, libtcod.BKGND_NONE, libtcod.LEFT,
-            player.possessed_entity.name.center(20))
+            centered_name)
 
         render_bar(panel, 1, 2, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp,
             libtcod.light_red, libtcod.darker_red)
