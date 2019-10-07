@@ -1,4 +1,5 @@
 import tcod as libtcod
+import tcod.event
 
 from components.ai import SlowMonster
 from components.equipment import EquipmentSlots, Equipment
@@ -10,7 +11,7 @@ from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
 from game_messages import Message
 from game_states import GameStates
-from input_handlers import handle_keys, handle_mouse, handle_main_menu
+from input_handlers import handle_keys, handle_main_menu
 from loader_functions.data_loaders import save_game, load_game
 from loader_functions.initialize_new_game import Constants, get_game_variables
 from menus import main_menu, message_box
@@ -51,11 +52,19 @@ def main():
     bg_path = app_path('assets', 'images', 'menu_fire_background.png')
     main_menu_background_image = libtcod.image_load(bg_path)
 
-    key = libtcod.Key()
-    mouse = libtcod.Mouse()
-
-    while not libtcod.console_is_window_closed():
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+    while True:
+        key = 0
+        for event in libtcod.event.get():
+            print(f"Got Event: {event.type}")
+            if event.type in ("QUIT"):
+                print("QUIT event: Exiting")
+                raise SystemExit()
+            if event.type == "KEYDOWN":
+                if event.sym == libtcod.event.K_ESCAPE:
+                    print(f"{event.type} K_ESCAPE: Exiting")
+                    raise SystemExit()
+                else:
+                    key = event.sym
 
         if show_main_menu:
             main_menu(con, main_menu_background_image, Constants.screen_width,
@@ -98,9 +107,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     fov_recompute = True
     fov_map = initialize_fov(game_map)
 
-    key = libtcod.Key()
-    mouse = libtcod.Mouse()
-
     previous_game_state = game_state
 
     targeting_item = None
@@ -109,16 +115,40 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     message_log.add_message(Message(f'Use the arrow keys to move', libtcod.white))
     message_log.add_message(Message(f'Press \'p\' to possess a creature and gain it\'s abilities', libtcod.white))
 
+    mouse_event = None
+    while True:
+        key = 0
+        left_click = None
+        right_click = None
+        exit_game = False
 
-    while not libtcod.console_is_window_closed():
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+        for event in libtcod.event.get():
+            print(f"Got Event: {event.type}")
+            if event.type in ("QUIT"):
+                print("QUIT event: Exiting")
+                raise SystemExit()
+            if event.type == "KEYDOWN":
+                if event.sym == libtcod.event.K_ESCAPE:
+                    print(f"{event.type} K_ESCAPE: Exiting")
+                    exit_game = True
+                else:
+                    key = event.sym
+            if event.type == "MOUSEMOTION":
+                mouse_event = event
+                if event.state & libtcod.event.BUTTON_LMASK:
+                    left_click = mouse_event
+                if event.state & libtcod.event.BUTTON_RMASK:
+                    right_click = mouse_event
+
+        if exit_game:
+            break
 
         fov_radius = player.fighter.fov() if player.fighter else Constants.min_fov_radius
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, Constants.fov_light_walls, Constants.fov_algorithm)
 
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, Constants.screen_width,
-                   Constants.screen_height, Constants.bar_width, Constants.panel_height, Constants.panel_y, mouse, Constants.colors, game_state)
+                   Constants.screen_height, Constants.bar_width, Constants.panel_height, Constants.panel_y, mouse_event, Constants.colors, game_state)
 
         fov_recompute = False
 
@@ -126,7 +156,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
         clear_all(con, entities)
         action = handle_keys(key, game_state)
-        mouse_action = handle_mouse(mouse)
 
         move = action.get('move')
         wait = action.get('wait')
@@ -142,9 +171,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         possession = action.get('possession')
         start_test_mode = action.get('start_test_mode')
         restart = action.get('restart')
-
-        left_click = mouse_action.get('left_click')
-        right_click = mouse_action.get('right_click')
 
         player_turn_results = []
 
