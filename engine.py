@@ -34,7 +34,7 @@ def main():
 
     libtcod.console_set_custom_font(arial_font_path, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-    libtcod.console_init_root(Constants.screen_width, Constants.screen_height, Constants.window_title, False)
+    libtcod.console_init_root(Constants.screen_width, Constants.screen_height, Constants.window_title, False, libtcod.RENDERER_SDL2)
 
     con = libtcod.console_new(Constants.screen_width, Constants.screen_height)
     panel = libtcod.console_new(Constants.screen_width, Constants.panel_height)
