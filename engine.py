@@ -148,7 +148,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
         player_turn_results = []
 
-        if start_test_mode:
+        if False: # start_test_mode:
             fighter_component = Fighter(hp=30, defense=2, power=8, body='god mode', xp=100, will_power = 4)
             player.fighter = fighter_component
             player.fighter.owner = player
