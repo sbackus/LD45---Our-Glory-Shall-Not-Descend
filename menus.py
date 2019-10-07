@@ -76,7 +76,7 @@ def character_screen(player, character_screen_width, character_screen_height, sc
     libtcod.console_print_rect_ex(window, 0, 1, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
                                   libtcod.LEFT, 'Character Information')
     libtcod.console_print_rect_ex(window, 0, 2, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
-                                  libtcod.LEFT, 'Level: {0}'.format(player.level.current_level))
+                                  libtcod.LEFT, 'Ghost Level: {0}'.format(player.level.current_level))
     libtcod.console_print_rect_ex(window, 0, 3, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
                                   libtcod.LEFT, 'Experience: {0}'.format(player.level.current_xp))
     libtcod.console_print_rect_ex(window, 0, 4, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
@@ -88,6 +88,12 @@ def character_screen(player, character_screen_width, character_screen_height, sc
                                       libtcod.LEFT, 'Attack: {0}'.format(player.fighter.power))
         libtcod.console_print_rect_ex(window, 0, 8, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
                                       libtcod.LEFT, 'Defense: {0}'.format(player.fighter.defense))
+        libtcod.console_print_rect_ex(window, 0, 10, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
+                                      libtcod.LEFT, '{0} Level: {1}'.format(player.fighter.body, player.fighter.level.current_level))
+        libtcod.console_print_rect_ex(window, 0, 11, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
+                                      libtcod.LEFT, 'Experience: {0}'.format(player.fighter.level.current_xp))
+        libtcod.console_print_rect_ex(window, 0, 12, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
+                                      libtcod.LEFT, 'Experience to Level: {0}'.format(player.fighter.level.experience_to_next_level))
 
     x = screen_width // 2 - character_screen_width // 2
     y = screen_height // 2 - character_screen_height // 2
