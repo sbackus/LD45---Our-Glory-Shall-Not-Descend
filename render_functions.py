@@ -98,8 +98,13 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         y += 1
 
     if player.fighter:
-        render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp,
-               libtcod.light_red, libtcod.darker_red)
+        libtcod.console_set_default_foreground(panel, libtcod.white)
+        libtcod.console_print_ex(panel, 1, 1, libtcod.BKGND_NONE, libtcod.LEFT,
+            player.possessed_entity.name.center(20))
+
+        render_bar(panel, 1, 2, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp,
+            libtcod.light_red, libtcod.darker_red)
+
     libtcod.console_print_ex(panel, 1, 3, libtcod.BKGND_NONE, libtcod.LEFT,
                              'Dungeon level: {0}'.format(game_map.dungeon_level))
 
