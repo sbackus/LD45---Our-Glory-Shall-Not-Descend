@@ -224,9 +224,11 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
                         break
                 else:
-                    message_log.add_message(Message('There is nothing here to pick up.', libtcod.yellow))
+                    message_log.add_message(Message('There is nothing here to pick up!', libtcod.yellow))
+            elif player.fighter:
+                message_log.add_message(Message('This creature cannot carry or use items.', libtcod.yellow))
             else:
-                message_log.add_message(Message('you can not pick things up until you find a body', libtcod.yellow))
+                message_log.add_message(Message("You can't pick up items without a body of some kind...", libtcod.yellow))
 
 
         if show_inventory:
