@@ -105,6 +105,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
     targeting_item = None
 
+    message_log.add_message(Message(f'You have nothing. Not even a Body', libtcod.blue))
+    message_log.add_message(Message(f'Press \'p\' to possess a creature and gain it\'s abilities', libtcod.blue))
+
+
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
