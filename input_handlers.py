@@ -95,6 +95,7 @@ def handle_player_turn_keys(key):
 def handle_player_dead_keys(key):
     key_char = chr(key.c)
 
+    print(key_char)
     if key_char == 'i':
         return {'show_inventory': True}
 
@@ -104,7 +105,8 @@ def handle_player_dead_keys(key):
     elif key.vk == libtcod.KEY_ESCAPE:
         # Exit the menu
         return {'exit': True}
-
+    elif key_char == 'c' or key_char == 'r':
+        return {'restart': True}
     return {}
 
 def handle_inventory_keys(key):

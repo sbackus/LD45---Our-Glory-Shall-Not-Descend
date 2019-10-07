@@ -136,6 +136,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         fullscreen = action.get('fullscreen')
         possession = action.get('possession')
         start_test_mode = action.get('start_test_mode')
+        restart = action.get('restart')
 
         left_click = mouse_action.get('left_click')
         right_click = mouse_action.get('right_click')
@@ -153,6 +154,13 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=1)
             item = Entity(player.x, player.y, '/', libtcod.red, 'Small Dagger', equippable=equippable_component)
             entities.append(item)
+
+        if restart:
+            player, entities, game_map, message_log, game_state = get_game_variables(Constants)
+            game_state = GameStates.PLAYERS_TURN
+            fov_map = initialize_fov(game_map)
+            fov_recompute = True
+            libtcod.console_clear(con)
 
         if possession:
             if not player.fighter:
@@ -364,6 +372,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 targeting_item = targeting
 
                 message_log.add_message(targeting_item.item.targeting_message)
+
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
