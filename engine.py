@@ -105,8 +105,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
     targeting_item = None
 
-    message_log.add_message(Message(f'You have nothing. Not even a Body', libtcod.blue))
-    message_log.add_message(Message(f'Press \'p\' to possess a creature and gain it\'s abilities', libtcod.blue))
+    message_log.add_message(Message(f'You are ghost.  You have nothing.', libtcod.white))
+    message_log.add_message(Message(f'Use the arrow keys to move', libtcod.white))
+    message_log.add_message(Message(f'Press \'p\' to possess a creature and gain it\'s abilities', libtcod.white))
 
 
     while not libtcod.console_is_window_closed():
