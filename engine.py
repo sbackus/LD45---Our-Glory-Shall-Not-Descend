@@ -55,7 +55,6 @@ def main():
     while True:
         key = 0
         for event in libtcod.event.get():
-            print(f"Got Event: {event.type}")
             if event.type in ("QUIT"):
                 print("QUIT event: Exiting")
                 raise SystemExit()
@@ -65,6 +64,7 @@ def main():
                     raise SystemExit()
                 else:
                     key = event.sym
+                print(f"Got Event: {event.type}: {key}")
 
         if show_main_menu:
             main_menu(con, main_menu_background_image, Constants.screen_width,
@@ -123,7 +123,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         exit_game = False
 
         for event in libtcod.event.get():
-            print(f"Got Event: {event.type}")
+            #print(f"Got Event: {event.type}")
             if event.type in ("QUIT"):
                 print("QUIT event: Exiting")
                 raise SystemExit()
@@ -133,12 +133,15 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     exit_game = True
                 else:
                     key = event.sym
+                #print(f"Got Event: {event.type}: {key}")
             if event.type == "MOUSEMOTION":
                 mouse_event = event
                 if event.state & libtcod.event.BUTTON_LMASK:
                     left_click = mouse_event
                 if event.state & libtcod.event.BUTTON_RMASK:
                     right_click = mouse_event
+                if left_click or right_click:
+                    print(f"Got Event: {event.type}{' + Left Click' if left_click else ''}{' + Right Click' if right_click else ''}")
 
         if exit_game:
             break
