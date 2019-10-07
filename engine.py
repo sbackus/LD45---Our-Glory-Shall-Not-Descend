@@ -175,6 +175,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             player.fighter = entity.fighter
                             player.inventory = entity.inventory
                             player.equipment = entity.equipment
+                            player.possessed_entity = entity
                             player.fighter.owner = player
                             player.char = entity.char
                             player.render_order = entity.render_order
@@ -184,18 +185,20 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
 
             else:
-                message_log.add_message(Message(f'You cast your spirit out of your body leaving a shambling husk behind', libtcod.blue))
+                message_log.add_message(Message(f'You cast your spirit out of your body, leaving a shambling husk behind...', libtcod.blue))
                 ai_component = SlowMonster()
-                monster = Entity(player.x, player.y, 'z', libtcod.desaturated_green, 'Zombie', blocks=True, render_order=RenderOrder.ACTOR, fighter=player.fighter, ai=ai_component, inventory = player.inventory, equipment = player.equipment)
-                monster.fighter.xp = 5
+                zombie_name = f'Zombie {player.possessed_entity.name}'
+                zombie_char = player.possessed_entity.char
+                zombie = Entity(player.x, player.y, zombie_char, libtcod.desaturated_green, zombie_name, blocks=True, render_order=RenderOrder.ACTOR, fighter=player.fighter, ai=ai_component, inventory = player.inventory, equipment = player.equipment)
+                zombie.fighter.xp = 5
+                zombie.fighter.owner = zombie
+                entities.append(zombie)
+
                 player.fighter = None
                 player.inventory = None
                 player.equipment = None
                 player.char = ' '
                 player.render_order = RenderOrder.GHOST
-
-                monster.fighter.owner = monster
-                entities.append(monster)
 
         if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = move
@@ -226,7 +229,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 else:
                     message_log.add_message(Message('There is nothing here to pick up!', libtcod.yellow))
             elif player.fighter:
-                message_log.add_message(Message('This creature cannot carry or use items.', libtcod.yellow))
+                message_log.add_message(Message('This creature cannot carry items.', libtcod.yellow))
             else:
                 message_log.add_message(Message("You can't pick up items without a body of some kind...", libtcod.yellow))
 
