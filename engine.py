@@ -53,7 +53,7 @@ def main():
     main_menu_background_image = libtcod.image_load(bg_path)
 
     while True:
-        key = 0
+        key_event = None
         for event in libtcod.event.get():
             if event.type in ("QUIT"):
                 print("QUIT event: Exiting")
@@ -63,8 +63,8 @@ def main():
                     print(f"{event.type} K_ESCAPE: Exiting")
                     raise SystemExit()
                 else:
-                    key = event.sym
-                print(f"Got Event: {event.type}: {key}")
+                    key_event = event
+                #print(f"Got Event: {event.type}: {key_event}")
 
         if show_main_menu:
             main_menu(con, main_menu_background_image, Constants.screen_width,
@@ -75,11 +75,12 @@ def main():
 
             libtcod.console_flush()
 
-            action = handle_main_menu(key)
+            action = handle_main_menu(key_event)
 
             new_game = action.get('new_game')
             load_saved_game = action.get('load_game')
             exit_game = action.get('exit')
+            fullscreen = action.get('fullscreen')
 
             if show_load_error_message and (new_game or load_saved_game or exit_game):
                 show_load_error_message = False
@@ -96,6 +97,9 @@ def main():
                     show_load_error_message = True
             elif exit_game:
                 break
+
+            if fullscreen:
+                libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
         else:
             con.clear()
@@ -120,7 +124,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     first_inventory = True
     mouse_event = None
     while True:
-        key = 0
+        key_event = None
         left_click = None
         right_click = None
         exit_game = False
@@ -135,7 +139,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     print(f"{event.type} K_ESCAPE: Exiting")
                     exit_game = True
                 else:
-                    key = event.sym
+                    key_event = event
                 #print(f"Got Event: {event.type}: {key}")
             if event.type == "MOUSEMOTION":
                 mouse_event = event
@@ -143,8 +147,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     left_click = mouse_event
                 if event.state & libtcod.event.BUTTON_RMASK:
                     right_click = mouse_event
-                if left_click or right_click:
-                    print(f"Got Event: {event.type}{' + Left Click' if left_click else ''}{' + Right Click' if right_click else ''}")
 
         if exit_game:
             break
@@ -161,7 +163,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         libtcod.console_flush()
 
         clear_all(con, entities)
-        action = handle_keys(key, game_state)
+        action = handle_keys(key_event, game_state)
 
         move = action.get('move')
         wait = action.get('wait')
@@ -175,7 +177,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
         possession = action.get('possession')
-        start_test_mode = action.get('start_test_mode')
+        #start_test_mode = action.get('start_test_mode')
         restart = action.get('restart')
 
         player_turn_results = []
