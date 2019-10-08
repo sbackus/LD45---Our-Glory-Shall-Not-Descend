@@ -1,5 +1,6 @@
 # game data
 savegame.dat
+savegame.dat.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -9,7 +10,9 @@ __pycache__/
 # C extensions
 *.so
 
+assets/.DS_Store
 .DS_Store
+.vscode
 
 # Distribution / packaging
 .Python
@@ -22,6 +25,7 @@ lib/
 lib64/
 parts/
 sdist/
+dist/
 var/
 wheels/
 *.egg-info/
