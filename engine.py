@@ -105,10 +105,13 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
     targeting_item = None
 
-    message_log.add_message(Message(f'You are ghost.  You have nothing.', libtcod.white))
+    message_log.add_message(Message(f'You are a ghost.  You have nothing.', libtcod.white))
     message_log.add_message(Message(f'Use the arrow keys to move', libtcod.white))
-    message_log.add_message(Message(f'Press \'p\' to possess a creature and gain it\'s abilities', libtcod.white))
+    message_log.add_message(Message(f'Press \'p\' to possess a creature and gain its abilities...', libtcod.white))
+    message_log.add_message(Message(f'(Mouse over symbols for more information)', libtcod.white))
 
+    first_body = True
+    first_inventory = True
 
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
@@ -172,7 +175,13 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 for entity in entities:
                     if entity.fighter and entity.x == player.x and entity.y == player.y:
                         if player.level.current_level >= entity.fighter.will_power:
-                            message_log.add_message(Message(f'You take control of the {entity.name} body', libtcod.blue))
+                            message_log.add_message(Message(f"You take control of the {entity.name}'s body...", libtcod.white))
+                            if first_body:
+                                message_log.add_message(Message(f'(Press p to release it)', libtcod.blue))
+                                first_body = False
+                            if entity.inventory and first_inventory:
+                                message_log.add_message(Message(f'(Press g to Get items, i for Inventory)', libtcod.gray))
+                                first_inventory = False
                             player.fighter = entity.fighter
                             player.inventory = entity.inventory
                             player.equipment = entity.equipment
@@ -180,13 +189,14 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                             player.fighter.owner = player
                             player.char = entity.char
                             player.render_order = entity.render_order
+                            player.name = f'Ghost/{entity.name}'
                             entities.remove(entity)
                         else:
-                            message_log.add_message(Message(f'{entity.name} is too powerful for you to possess', libtcod.blue))
+                            message_log.add_message(Message(f'The {entity.name} is too powerful for you to possess!', libtcod.yellow))
 
 
             else:
-                message_log.add_message(Message(f'You cast your spirit out of your body, leaving a shambling husk behind...', libtcod.blue))
+                message_log.add_message(Message(f'You cast your spirit out of the {player.possessed_entity.name}, leaving a shambling husk behind...', libtcod.red))
                 ai_component = SlowMonster()
                 zombie_name = f'Zombie {player.possessed_entity.name}'
                 zombie_char = player.possessed_entity.char
@@ -200,6 +210,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 player.equipment = None
                 player.char = ' '
                 player.render_order = RenderOrder.GHOST
+                player.name = 'Ghost'
 
         if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = move
@@ -214,6 +225,23 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 else:
                     player.move(dx, dy)
                     fov_recompute = True
+                    over_entities = [e for e in entities if e.x == player.x and e.y == player.y and e != player]
+                    if over_entities:
+                        over_fighters = [e for e in over_entities if e.fighter]
+                        over_items = [e for e in over_entities if not e.fighter]
+                        if over_fighters:
+                            over_fighter = over_fighters[0]
+                            message_log.add_message(Message(f'Your shadow falls over the {over_fighter.name}...', libtcod.white))
+                        elif over_items:
+                            if len(over_items) == 1:
+                                over_items_list = f'{over_items[0].name}'
+                            elif len(over_items) == 2:
+                                over_items_list = f'{over_items[1].name} and a {over_items[0].name}'
+                            else:
+                                over_items_list = [n.name for n in over_items[:-1]].join(', a ')
+                                over_items_list += "and a {over_items[-1].name}"
+                            message_log.add_message(Message(f'There is a {over_items_list} here.', libtcod.white))
+
                 game_state = GameStates.ENEMY_TURN
 
         elif wait:
@@ -322,22 +350,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
             if targeting_cancelled:
                 game_state = previous_game_state
-                message_log.add_message(Message('Targeting cancelled'))
-
-            if xp:
-                leveled_up = player.level.add_xp(xp)
-                fighter_leveled_up = player.fighter.level.add_xp(xp)
-                message_log.add_message(Message('You gain {0} experience points.'.format(xp)))
-
-                if leveled_up:
-                    message_log.add_message(Message(
-                        'You grow stronger! You reached level {0}'.format(
-                            player.level.current_level) + '!', libtcod.yellow))
-                    message_log.add_message(Message('you can now possess larger creatures'))
-
-                if fighter_leveled_up:
-                    previous_game_state = game_state
-                    game_state = GameStates.LEVEL_UP
+                message_log.add_message(Message('Targeting cancelled', libtcod.yellow))
 
             if dead_entity:
                 if dead_entity.fighter == player.fighter:
@@ -346,6 +359,21 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     message = kill_monster(dead_entity)
 
                 message_log.add_message(message)
+
+            if xp:
+                leveled_up = player.level.add_xp(xp)
+                fighter_leveled_up = player.fighter.level.add_xp(xp)
+                message_log.add_message(Message('You gain {0} experience points.'.format(xp), libtcod.white))
+
+                if leveled_up:
+                    message_log.add_message(Message(
+                        'You grow stronger! You reached level {0}'.format(
+                            player.level.current_level) + '!', libtcod.green))
+                    message_log.add_message(Message('You can now possess larger creatures...', libtcod.red))
+
+                if fighter_leveled_up:
+                    previous_game_state = game_state
+                    game_state = GameStates.LEVEL_UP
 
             if item_added:
                 entities.remove(item_added)
