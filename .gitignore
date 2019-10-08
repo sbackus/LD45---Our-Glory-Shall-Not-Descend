@@ -12,6 +12,7 @@ __pycache__/
 
 assets/.DS_Store
 .DS_Store
+.vscode
 
 # Distribution / packaging
 .Python
