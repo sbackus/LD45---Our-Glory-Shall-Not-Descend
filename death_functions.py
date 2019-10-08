@@ -9,7 +9,7 @@ def kill_player(player):
     player.char = '%'
     player.color = libtcod.dark_red
 
-    return Message('You lost your memories you\'re now a ghost', libtcod.red), GameStates.PLAYER_DEAD
+    return Message('Your body dies, and your memories die with it...', libtcod.red), GameStates.PLAYER_DEAD
 
 
 def kill_monster(monster):
