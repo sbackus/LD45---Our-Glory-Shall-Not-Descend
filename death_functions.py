@@ -9,18 +9,18 @@ def kill_player(player):
     player.char = '%'
     player.color = libtcod.dark_red
 
-    return Message('You lost your memories you\'re now a ghost', libtcod.red), GameStates.PLAYER_DEAD
+    return Message('Your body dies, and your memories die with it...', libtcod.red), GameStates.PLAYER_DEAD
 
 
 def kill_monster(monster):
-    death_message = Message('{0} is dead!'.format(monster.name.capitalize()), libtcod.orange)
+    death_message = Message('The {0} is dead!'.format(monster.name.capitalize()), libtcod.orange)
 
     monster.char = '%'
     monster.color = libtcod.dark_red
     monster.blocks = False
     monster.fighter = None
     monster.ai = None
-    monster.name = 'remains of ' + monster.name
+    monster.name = 'dead ' + monster.name
     monster.render_order = RenderOrder.CORPSE
 
     return death_message

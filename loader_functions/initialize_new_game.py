@@ -15,7 +15,7 @@ from render_functions import RenderOrder
 def get_game_variables(config):
     level_component = Level(current_level=0, current_xp=0, level_up_base=2, level_up_factor=3, level_up_exponent=2)
 
-    player = Entity(0, 0, ' ', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.GHOST, level=level_component)
+    player = Entity(0, 0, ' ', libtcod.white, 'Ghost', blocks=True, render_order=RenderOrder.GHOST, level=level_component)
 
     entities = [player]
 
