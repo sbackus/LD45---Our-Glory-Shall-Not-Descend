@@ -177,7 +177,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         if player.level.current_level >= entity.fighter.will_power:
                             message_log.add_message(Message(f"You take control of the {entity.name}'s body...", libtcod.white))
                             if first_body:
-                                message_log.add_message(Message(f'(Press p to release it)', libtcod.blue))
+                                message_log.add_message(Message(f'(Press p to release it)', libtcod.gray))
                                 first_body = False
                             if entity.inventory and first_inventory:
                                 message_log.add_message(Message(f'(Press g to Get items, i for Inventory)', libtcod.gray))
@@ -241,7 +241,8 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                                 over_items_list = [n.name for n in over_items[:-1]].join(', a ')
                                 over_items_list += "and a {over_items[-1].name}"
                             message_log.add_message(Message(f'There is a {over_items_list} here.', libtcod.white))
-
+                            if 'Staircase' in [e.name for e in over_items] and player.fighter:
+                                message_log.add_message(Message(f'(Press enter/return to use stairs)', libtcod.gray))
                 game_state = GameStates.ENEMY_TURN
 
         elif wait:
