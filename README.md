@@ -1,6 +1,7 @@
 # LudumDare45
 
 LudumDare45
+https://ldjam.com/events/ludum-dare/45/our-glory-shall-not-descend
 
 ## Theme:
 
@@ -17,7 +18,7 @@ http://rogueliketutorials.com/tutorials/tcod/
 
 The latest Mac apps and Windows .exe builds are available here:
 
-https://github.com/sbackus/LudumDare45/releases/latest
+https://github.com/sbackus/LudumDare45/releases/latest 
 
 ## From Source
 
