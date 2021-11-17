@@ -1,4 +1,5 @@
 # LudumDare45
+A rogue-like where instead of starting with a class, equipment or even a body, you start with nothing...d
 
 LudumDare45
 https://ldjam.com/events/ludum-dare/45/our-glory-shall-not-descend
