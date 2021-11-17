@@ -1,5 +1,5 @@
-# LudumDare45
-A rogue-like where instead of starting with a class, equipment or even a body, you start with nothing...d
+# Our Glory Shall Not Descend
+A rogue-like where instead of starting with a class, equipment or even a body, you start with nothing
 
 LudumDare45
 https://ldjam.com/events/ludum-dare/45/our-glory-shall-not-descend
@@ -10,7 +10,8 @@ https://ldjam.com/events/ludum-dare/45/our-glory-shall-not-descend
 
 ## Description
 
-A rogue-like where instead of starting with a class, equipment or even a body, you start with nothing...
+A rogue-like game written in Python where instead of starting with a class, equipment or even a body, you start with nothing...
+You are a ghost and in order to level up you have to posess and fight progressivly larger creatures and solve puzzles
 
 Based in part on the LibTCOD tutorial:
 http://rogueliketutorials.com/tutorials/tcod/
