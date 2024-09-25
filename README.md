@@ -1,5 +1,6 @@
 # Our Glory Shall Not Descend
 A rogue-like where instead of starting with a class, equipment or even a body, you start with nothing
+Possess the creatures of the dungeon in order to level up and find your way through
 
 LudumDare45
 https://ldjam.com/events/ludum-dare/45/our-glory-shall-not-descend
